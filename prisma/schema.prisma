@@ -1,0 +1,163 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int         @id @default(autoincrement())
+  createdAt DateTime    @default(now())
+  firstname String
+  lastname  String
+  username  String
+  email     String      @unique
+  role      Role        @default(USER)
+  active    Boolean     @default(false)
+  players   Profile[]
+  inventory Inventory[]
+}
+
+model Profile {
+  id                Int      @id @default(autoincrement())
+  createdAt         DateTime @default(now())
+  name              String
+  species           String
+  alignment         String?
+  background        String
+  proficiency_bonus Int
+  initiative        String?
+  armor_class        String
+  User              User?    @relation(fields: [userId], references: [id])
+  userId            Int?
+  status Status[]
+
+}
+
+model Inventory {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    Int?
+
+}
+
+model Status {
+  strength Strength[]
+  dexterity Dexterity[]
+
+}
+
+// Strength
+model Strength {
+  Value    Int
+  Modifier Int
+  Saving_Throw Strength_Saving_Throw_Skill_Proficience[]
+  Athletics Strength_Atletics_Skill_Proficience[]
+}
+
+model Strength_Saving_Throw_Skill_Proficience {
+  proficience_selected Boolean @default(false)
+  Saving_Throw_Value   Int
+}
+
+model Strength_Atletics_Skill_Proficience {
+  proficience_selected Boolean @default(false)
+  expertise_selected   Boolean @default(false)
+  Atletics_Value Int
+}
+
+// Dexterity
+model Dexterity {
+  value                 Int
+  modifier              Int
+
+  acrobatics Acrobatics_Skill_Proficience[]
+  
+}
+
+model Dexterity_Saving_Throw_Skill_Proficience {
+  proficience_selected Boolean @default(false)
+  Saving_Throw_Value   Int
+}
+
+model Dexterity_Acrobatics_Skill_Proficience {
+  proficience_selected Boolean @default(false)
+  expertise_selected   Boolean @default(false)
+  Acrobatics_Value Int
+
+}
+
+model Dexterity_Sleight_Of_Hand_Skill_Proficience {
+  proficience_selected Boolean @default(false)
+  expertise_selected   Boolean @default(false)
+  Sleight_Of_Hand_Value Int
+
+}
+
+model Dexterity_Stealth_Skill_Proficience {
+  proficience_selected Boolean @default(false)
+  expertise_selected   Boolean @default(false)
+  Stealth_Value Int
+  Stealth_Status Boolean
+  // if (true) -> armadura pesada -> Stealth(OFF) -> Não pode se esgueirar
+  // If (false) -> armadura leve/médio -> Stealth(ON) -> Pode se esgueirar
+}
+
+model Constitution {
+  value    Int
+  modifier Int
+
+}
+
+model Intelligence {
+  value    Int
+  modifier Int
+
+}
+
+model Wisdom {
+  value    Int
+  modifier Int
+
+}
+
+model Charisma {
+  value    Int
+  modifier Int
+
+}
+
+
+
+
+
+model Athletics_Skill_Proficience {
+  proficience_selected Boolean @default(false)
+  expertise_selected   Boolean @default(false)
+  Athletics_Value      Int
+}
+
+model Acrobatics_Skill_Proficience {
+  proficience Boolean
+  expertise   Boolean
+
+}
+
+model Sleight_of_Hand_Skill_Proficience {
+  proficience Boolean
+  expertise   Boolean
+
+}
+
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+}
